@@ -12,6 +12,7 @@ Compiler Features:
  * SMTChecker: Add CHC engine check for underflow and overflow in unary minus operation.
  * SMTChecker: Replace CVC4 as a possible BMC backend with cvc5.
  * Yul Optimizer: The optimizer now treats some previously unrecognized identical literals as identical.
+ * Commandline Interface: Allow the use of ``--asm-json`` output option in assembler mode to export EVM assembly of the contracts in JSON format.
 
 
 Bugfixes:

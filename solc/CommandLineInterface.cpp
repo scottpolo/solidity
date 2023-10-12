@@ -1174,6 +1174,32 @@ std::string CommandLineInterface::objectWithLinkRefsHex(evmasm::LinkerObject con
 	return out;
 }
 
+namespace
+{
+
+std::map<std::string, unsigned> collectYulSourceIndices(yul::Object const& _object)
+{
+	std::map<std::string, unsigned> sourceIndices;
+
+	auto registerSourceIndex = [&](std::string const& _name, unsigned _index) {
+		solAssert(sourceIndices.count(_name) == 0 || sourceIndices[_name] == _index);
+		sourceIndices[_name] = _index;
+	};
+
+	if (_object.debugData && _object.debugData->sourceNames.has_value())
+		for (auto const& [index, sourceName]: *_object.debugData->sourceNames)
+			registerSourceIndex(*sourceName, index);
+
+	for (auto const& subNode: _object.subObjects)
+		if (auto const* subObject = dynamic_cast<yul::Object const*>(subNode.get()))
+			for (auto const& [name, index]: collectYulSourceIndices(*subObject))
+				registerSourceIndex(name, index);
+
+	return sourceIndices;
+}
+
+}
+
 void CommandLineInterface::assembleYul(yul::YulStack::Language _language, yul::YulStack::Machine _targetMachine)
 {
 	solAssert(m_options.input.mode == InputMode::Assembler);
@@ -1259,6 +1285,26 @@ void CommandLineInterface::assembleYul(yul::YulStack::Language _language, yul::Y
 				sout() << object.assembly << std::endl;
 			else
 				report(Error::Severity::Info, "No text representation found.");
+		}
+		if (m_options.compiler.outputs.asmJson)
+		{
+			std::shared_ptr<evmasm::Assembly> assembly{stack.assembleEVMWithDeployed().first};
+			if (assembly)
+				if (stack.parserResult() && stack.parserResult()->debugData)
+				{
+					std::map<std::string, unsigned> sourceIndices = collectYulSourceIndices(*stack.parserResult());
+					// If sourceIndices are empty, there were no source locations annotated in the yul source.
+					// In this case, we just add the filename of the yul file itself.
+					if (sourceIndices.empty())
+						sourceIndices[src.first] = 0;
+
+					sout() << util::jsonPrint(
+						removeNullMembers(assembly->assemblyJSON(sourceIndices)),
+						m_options.formatting.json
+					) << std::endl;
+					return;
+				}
+			serr() << "Could not create Assembly JSON representation." << std::endl;
 		}
 	}
 }
