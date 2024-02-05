@@ -29,8 +29,8 @@
     ],
     "sourceList":
     [
-        "unknown-source-0",
-        "unknown-source-1",
+        "#unknown-source-0",
+        "#unknown-source-1",
         "L0.sol"
     ]
 }

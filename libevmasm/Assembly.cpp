@@ -487,7 +487,7 @@ Json Assembly::assemblyJSON(std::map<std::string, unsigned> const& _sourceIndice
 		}
 		for (unsigned i = 0; i < maxSourceIndex; ++i)
 			if (jsonSourceList[i] == Json::nullValue)
-				jsonSourceList[i] = "unknown-source-" + std::to_string(i);
+				jsonSourceList[i] = "#unknown-source-" + std::to_string(i);
 	}
 
 	if (!m_data.empty() || !m_subs.empty())
