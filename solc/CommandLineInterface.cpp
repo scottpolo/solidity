@@ -1261,12 +1261,10 @@ void CommandLineInterface::assembleYul(yul::YulStack::Language _language, yul::Y
 				report(Error::Severity::Info, "No text representation found.");
 		}
 		if (m_options.compiler.outputs.asmJson)
-		{
 			sout() << util::jsonPrint(
 				removeNullMembers(stack.assemblyJson()),
 				m_options.formatting.json
 			) << std::endl;
-		}
 	}
 }
 
