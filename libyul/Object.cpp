@@ -159,3 +159,33 @@ std::vector<size_t> Object::pathToSubObject(YulString _qualifiedName) const
 
 	return path;
 }
+
+void Object::collectSourceIndices(std::map<unsigned int, std::set<std::string>>& _indices) const
+{
+	if (this->debugData)
+		if (this->debugData->sourceNames.has_value())
+			for (auto const& item: this->debugData->sourceNames.value())
+				_indices[item.first].insert(*item.second);
+	for (auto const& subNode: this->subObjects)
+		if (auto subObject = dynamic_cast<Object*>(subNode.get()))
+			subObject->collectSourceIndices(_indices);
+}
+
+bool Object::checkSourceIndices() const
+{
+	std::map<unsigned, std::set<std::string>> sourceIndices;
+	collectSourceIndices(sourceIndices);
+	unsigned maxSourceIndex{};
+	for (auto const& [sourceIndex, sources]: sourceIndices)
+	{
+		maxSourceIndex = std::max(sourceIndex, maxSourceIndex);
+		if (sources.size() != 1)
+			return false;
+	}
+
+	for (unsigned int i = 0; i <= maxSourceIndex; ++i)
+		if (sourceIndices.find(i) == sourceIndices.end())
+			return false;
+
+	return true;
+}

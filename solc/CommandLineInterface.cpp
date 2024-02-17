@@ -1196,6 +1196,13 @@ void CommandLineInterface::assembleYul(yul::YulStack::Language _language, yul::Y
 			successful = false;
 		else
 			stack.optimize();
+
+		if (m_options.compiler.outputs.asmJson)
+		{
+			auto const& result = stack.parserResult();
+			if (result && !result->checkSourceIndices())
+				solThrow(CommandLineExecutionError, "Assembly Import Error: source indices where incomplete. Please check @use-src attributes in your yul files.");
+		}
 	}
 
 	for (auto const& sourceAndStack: yulStacks)

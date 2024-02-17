@@ -1,3 +1,4 @@
+/// @use-src 0: "abc.sol"
 object "C_23" {
     code {
         {

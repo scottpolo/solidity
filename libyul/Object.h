@@ -126,6 +126,10 @@ public:
 
 	std::shared_ptr<ObjectDebugData const> debugData;
 
+	void collectSourceIndices(std::map<unsigned, std::set<std::string>>& _indices) const;
+
+	bool checkSourceIndices() const;
+
 	/// @returns the name of the special metadata data object.
 	static std::string metadataName() { return ".metadata"; }
 };

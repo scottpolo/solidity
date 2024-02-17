@@ -1,5 +1,1 @@
-Uncaught exception:
-/solidity/libevmasm/Assembly.cpp(488): Throw in function Json::Value solidity::evmasm::Assembly::assemblyJSON(const std::map<std::string, unsigned int> &, bool) const
-Dynamic exception type:
-std::exception::what: The 'sourceList' array contains invalid 'null' item.
-[solidity::util::tag_comment*] = The 'sourceList' array contains invalid 'null' item.
+Error: Assembly Import Error: source indices where incomplete. Please check @use-src attributes in your yul files.
