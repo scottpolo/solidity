@@ -177,7 +177,7 @@ void CommandLineInterface::handleEVMAssembly(std::string const& _contract)
 
 	std::string assembly;
 	if (m_options.compiler.outputs.asmJson)
-		assembly = util::jsonPrint(removeNullMembers(m_assemblyStack->assemblyJSON(_contract)), m_options.formatting.json);
+		assembly = util::jsonPrint(m_assemblyStack->assemblyJSON(_contract), m_options.formatting.json);
 	else
 		assembly = m_assemblyStack->assemblyString(_contract, m_fileReader.sourceUnits());
 
@@ -1268,10 +1268,13 @@ void CommandLineInterface::assembleYul(yul::YulStack::Language _language, yul::Y
 				report(Error::Severity::Info, "No text representation found.");
 		}
 		if (m_options.compiler.outputs.asmJson)
+		{
+			sout() << std::endl << "EVM assembly:" << std::endl;
 			sout() << util::jsonPrint(
-				removeNullMembers(stack.assemblyJson()),
+				object.assemblyJson,
 				m_options.formatting.json
 			) << std::endl;
+		}
 	}
 }
 
