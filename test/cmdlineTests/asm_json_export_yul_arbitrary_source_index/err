@@ -1,1 +1,1 @@
-Error: Assembly Import Error: source indices where incomplete. Please check @use-src attributes in your yul files.
+Error: Yul validation error: source indices where incomplete. Please check @use-src attributes.
