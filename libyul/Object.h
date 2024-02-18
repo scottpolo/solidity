@@ -126,7 +126,8 @@ public:
 
 	std::shared_ptr<ObjectDebugData const> debugData;
 
-	/// Collect all source indices of the Yul object and it's sub-objects.
+	/// Collect names of all Solidity source units present in the debug data
+	/// of the Yul object (including sub-objects) and their assigned indices.
 	/// @param _indices map that will be filled with source indices of the current Yul object & it's sub-objects.
 	void collectSourceIndices(std::map<std::string, unsigned>& _indices) const;
 
