@@ -126,8 +126,12 @@ public:
 
 	std::shared_ptr<ObjectDebugData const> debugData;
 
-	void collectSourceIndices(std::map<unsigned, std::set<std::string>>& _indices) const;
+	/// Collect all source indices of the Yul object and it's sub-objects.
+	/// @param _indices map that will be filled with source indices of the current Yul object & it's sub-objects.
+	void collectSourceIndices(std::map<std::string, unsigned>& _indices) const;
 
+	/// Checks whether all source indices where defined.
+	/// @returns true, if all source indices where defined, false otherwise.
 	bool checkSourceIndices() const;
 
 	/// @returns the name of the special metadata data object.

@@ -144,9 +144,6 @@ public:
 	/// Return the parsed and analyzed object.
 	std::shared_ptr<Object> parserResult() const;
 
-	/// Collect all source indices of the given Yul object.
-	static std::map<std::string, unsigned> sourceIndices(yul::Object const& _object);
-
 private:
 	bool parse(std::string const& _sourceName, std::string const& _source);
 	bool analyzeParsed();

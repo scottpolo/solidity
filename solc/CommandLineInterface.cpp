@@ -1197,7 +1197,7 @@ void CommandLineInterface::assembleYul(yul::YulStack::Language _language, yul::Y
 		else
 			stack.optimize();
 
-		if (m_options.compiler.outputs.asmJson)
+		if (successful && m_options.compiler.outputs.asmJson)
 		{
 			auto const& result = stack.parserResult();
 			if (result && !result->checkSourceIndices())

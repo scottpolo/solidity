@@ -383,7 +383,8 @@ Json::Value YulStack::assemblyJson() const
 
 	yulAssert(m_parserResult);
 	yulAssert(m_parserResult->debugData);
-	std::map<std::string, unsigned> yulSourceIndices = sourceIndices(*m_parserResult);
+	std::map<std::string, unsigned> yulSourceIndices;
+	m_parserResult->collectSourceIndices(yulSourceIndices);
 	// If sourceIndices are empty, there were no source locations annotated in the yul source.
 	// In this case, we just add the filename of the yul file itself.
 	if (yulSourceIndices.empty())

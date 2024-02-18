@@ -160,12 +160,15 @@ std::vector<size_t> Object::pathToSubObject(YulString _qualifiedName) const
 	return path;
 }
 
-void Object::collectSourceIndices(std::map<unsigned int, std::set<std::string>>& _indices) const
+void Object::collectSourceIndices(std::map<std::string, unsigned>& _indices) const
 {
 	if (this->debugData)
 		if (this->debugData->sourceNames.has_value())
 			for (auto const& item: this->debugData->sourceNames.value())
-				_indices[item.first].insert(*item.second);
+			{
+				solAssert(_indices.count(*item.second) == 0 || _indices[*item.second] == item.first);
+				_indices[*item.second] = item.first;
+			}
 	for (auto const& subNode: this->subObjects)
 		if (auto subObject = dynamic_cast<Object*>(subNode.get()))
 			subObject->collectSourceIndices(_indices);
@@ -173,18 +176,18 @@ void Object::collectSourceIndices(std::map<unsigned int, std::set<std::string>>&
 
 bool Object::checkSourceIndices() const
 {
-	std::map<unsigned, std::set<std::string>> sourceIndices;
+	std::map<std::string, unsigned> sourceIndices;
 	collectSourceIndices(sourceIndices);
 	unsigned maxSourceIndex{};
-	for (auto const& [sourceIndex, sources]: sourceIndices)
+	std::set<unsigned> indices;
+	for (auto const& [sources, sourceIndex]: sourceIndices)
 	{
 		maxSourceIndex = std::max(sourceIndex, maxSourceIndex);
-		if (sources.size() != 1)
-			return false;
+		indices.insert(sourceIndex);
 	}
 
 	for (unsigned int i = 0; i <= maxSourceIndex; ++i)
-		if (sourceIndices.find(i) == sourceIndices.end())
+		if (indices.find(i) == indices.end())
 			return false;
 
 	return true;
