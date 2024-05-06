@@ -485,8 +485,6 @@ Json Assembly::assemblyJSON(std::map<std::string, unsigned> const& _sourceIndice
 			maxSourceIndex = std::max(sourceIndex, maxSourceIndex);
 			jsonSourceList[sourceIndex] = sourceName;
 		}
-		for (unsigned i = 0; i < maxSourceIndex; ++i)
-			solRequire(jsonSourceList[i] != Json::nullValue, AssemblyImportException, "The 'sourceList' array contains invalid 'null' item.");
 	}
 
 	if (!m_data.empty() || !m_subs.empty())
