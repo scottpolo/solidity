@@ -1242,6 +1242,7 @@ void CommandLineInterface::assembleYul(yul::YulStack::Language _language, yul::Y
 		}
 
 		yul::MachineAssemblyObject object;
+		stack.requestAsmJsonOutput(m_options.compiler.outputs.asmJson);
 		object = stack.assemble(_targetMachine);
 		object.bytecode->link(m_options.linker.libraries);
 

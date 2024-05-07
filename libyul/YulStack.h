@@ -145,6 +145,8 @@ public:
 	/// Return the parsed and analyzed object.
 	std::shared_ptr<Object> parserResult() const;
 
+	void requestAsmJsonOutput(bool _asmJsonOutput);
+
 private:
 	bool parse(std::string const& _sourceName, std::string const& _source);
 	bool analyzeParsed();
@@ -170,6 +172,8 @@ private:
 	langutil::ErrorReporter m_errorReporter;
 
 	std::unique_ptr<std::string> m_sourceMappings;
+
+	bool m_requestAsmJsonOutput = false;
 };
 
 }
