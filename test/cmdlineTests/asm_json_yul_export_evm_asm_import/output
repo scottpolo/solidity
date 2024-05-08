@@ -4,8 +4,7 @@ Binary:
 60055f5500
 EVM assembly:
 {
-    ".code":
-    [
+    ".code": [
         {
             "begin": -1,
             "end": -1,
@@ -32,8 +31,7 @@ EVM assembly:
             "source": -1
         }
     ],
-    "sourceList":
-    [
+    "sourceList": [
         "L0.sol",
         "L1.sol",
         "L2.sol"

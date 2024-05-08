@@ -3,8 +3,7 @@
 
 EVM assembly:
 {
-    ".code":
-    [
+    ".code": [
         {
             "begin": -1,
             "end": -1,
@@ -13,8 +12,7 @@ EVM assembly:
             "value": "78797a"
         }
     ],
-    "sourceList":
-    [
+    "sourceList": [
         "abc.sol"
     ]
 }

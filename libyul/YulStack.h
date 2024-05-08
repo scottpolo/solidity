@@ -56,7 +56,7 @@ struct MachineAssemblyObject
 {
 	std::shared_ptr<evmasm::LinkerObject> bytecode;
 	std::string assembly;
-	Json::Value assemblyJson;
+	Json assemblyJson;
 	std::unique_ptr<std::string> sourceMappings;
 };
 

@@ -3,8 +3,7 @@
 
 EVM assembly:
 {
-    ".code":
-    [
+    ".code": [
         {
             "begin": 41,
             "end": 137,
@@ -210,12 +209,9 @@ EVM assembly:
             "source": -1
         }
     ],
-    ".data":
-    {
-        "0":
-        {
-            ".code":
-            [
+    ".data": {
+        "0": {
+            ".code": [
                 {
                     "begin": 57,
                     "end": 158,
@@ -343,12 +339,9 @@ EVM assembly:
                     "source": -1
                 }
             ],
-            ".data":
-            {
-                "0":
-                {
-                    ".code":
-                    [
+            ".data": {
+                "0": {
+                    ".code": [
                         {
                             "begin": 41,
                             "end": 100,
@@ -396,12 +389,9 @@ EVM assembly:
                             "source": -1
                         }
                     ],
-                    ".data":
-                    {
-                        "0":
-                        {
-                            ".code":
-                            [
+                    ".data": {
+                        "0": {
+                            ".code": [
                                 {
                                     "begin": -1,
                                     "end": -1,
@@ -412,10 +402,8 @@ EVM assembly:
                         }
                     }
                 },
-                "1":
-                {
-                    ".code":
-                    [
+                "1": {
+                    ".code": [
                         {
                             "begin": -1,
                             "end": -1,
@@ -428,8 +416,7 @@ EVM assembly:
         },
         "ACAF3289D7B601CBD114FB36C4D29C85BBFD5E133F14CB355C3FD8D99367964F": "48656c6c6f2c20576f726c6421"
     },
-    "sourceList":
-    [
+    "sourceList": [
         "a.sol",
         "b.sol",
         "c.sol",
