@@ -1,1 +1,1 @@
-Error: Yul validation error: source indices where incomplete. Please check @use-src attributes.
+Error: Generating the assembly JSON output was not possible. Source indices provided in the @use-src annotation in the Yul input do not start at 0 or are not contiguous.

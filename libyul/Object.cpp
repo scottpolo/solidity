@@ -173,7 +173,7 @@ void Object::collectSourceIndices(std::map<std::string, unsigned>& _indices) con
 			subObject->collectSourceIndices(_indices);
 }
 
-bool Object::checkSourceIndices() const
+bool Object::hasContiguousSourceIndices() const
 {
 	std::map<std::string, unsigned> sourceIndices;
 	collectSourceIndices(sourceIndices);

@@ -15,10 +15,6 @@
 	along with solidity.  If not, see <http://www.gnu.org/licenses/>.
 */
 // SPDX-License-Identifier: GPL-3.0
-/**
- * Full assembly stack that can support Yul as input.
- */
-
 
 #include <libyul/YulStack.h>
 

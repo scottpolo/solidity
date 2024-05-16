@@ -1200,8 +1200,12 @@ void CommandLineInterface::assembleYul(yul::YulStack::Language _language, yul::Y
 		if (successful && m_options.compiler.outputs.asmJson)
 		{
 			std::shared_ptr<yul::Object> result = stack.parserResult();
-			if (result && !result->checkSourceIndices())
-				solThrow(CommandLineExecutionError, "Yul validation error: source indices where incomplete. Please check @use-src attributes.");
+			if (result && !result->hasContiguousSourceIndices())
+				solThrow(
+					CommandLineExecutionError,
+					"Generating the assembly JSON output was not possible. "
+					"Source indices provided in the @use-src annotation in the Yul input do not start at 0 or are not contiguous."
+				);
 		}
 	}
 
