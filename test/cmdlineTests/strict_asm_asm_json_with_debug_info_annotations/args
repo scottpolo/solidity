@@ -1,1 +1,1 @@
---strict-assembly - --asm-json
+--strict-assembly - --asm-json --pretty-json --json-indent 4
