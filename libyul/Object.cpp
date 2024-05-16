@@ -186,9 +186,6 @@ bool Object::checkSourceIndices() const
 		indices.insert(sourceIndex);
 	}
 
-	for (unsigned int i = 0; i <= maxSourceIndex; ++i)
-		if (indices.find(i) == indices.end())
-			return false;
-
-	return true;
+	solAssert(maxSourceIndex + 1 >= indices.size());
+	return indices.size() == 0 || indices.size() == maxSourceIndex + 1;
 }
