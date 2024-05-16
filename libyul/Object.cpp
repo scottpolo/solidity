@@ -162,14 +162,13 @@ std::vector<size_t> Object::pathToSubObject(YulString _qualifiedName) const
 
 void Object::collectSourceIndices(std::map<std::string, unsigned>& _indices) const
 {
-	if (this->debugData)
-		if (this->debugData->sourceNames.has_value())
-			for (auto const& item: this->debugData->sourceNames.value())
-			{
-				solAssert(_indices.count(*item.second) == 0 || _indices[*item.second] == item.first);
-				_indices[*item.second] = item.first;
-			}
-	for (auto const& subNode: this->subObjects)
+	if (debugData && debugData->sourceNames.has_value())
+		for (auto const& [sourceIndex, sourceName]: debugData->sourceNames.value())
+		{
+			solAssert(_indices.count(*sourceName) == 0 || _indices[*sourceName] == sourceIndex);
+			_indices[*sourceName] = sourceIndex;
+		}
+	for (std::shared_ptr<ObjectNode> const& subNode: subObjects)
 		if (auto subObject = dynamic_cast<Object*>(subNode.get()))
 			subObject->collectSourceIndices(_indices);
 }
@@ -178,7 +177,8 @@ bool Object::checkSourceIndices() const
 {
 	std::map<std::string, unsigned> sourceIndices;
 	collectSourceIndices(sourceIndices);
-	unsigned maxSourceIndex{};
+
+	unsigned maxSourceIndex = 0;
 	std::set<unsigned> indices;
 	for (auto const& [sources, sourceIndex]: sourceIndices)
 	{

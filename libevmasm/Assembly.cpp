@@ -479,7 +479,7 @@ Json Assembly::assemblyJSON(std::map<std::string, unsigned> const& _sourceIndice
 	{
 		root["sourceList"] = Json::array();
 		Json& jsonSourceList = root["sourceList"];
-		unsigned maxSourceIndex{};
+		unsigned maxSourceIndex = 0;
 		for (auto const& [sourceName, sourceIndex]: _sourceIndices)
 		{
 			maxSourceIndex = std::max(sourceIndex, maxSourceIndex);

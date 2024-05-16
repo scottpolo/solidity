@@ -139,9 +139,6 @@ public:
 	) const;
 	Json astJson() const;
 
-	/// Return the EVM assembly in Json format.
-	Json assemblyJson() const;
-
 	/// Return the parsed and analyzed object.
 	std::shared_ptr<Object> parserResult() const;
 

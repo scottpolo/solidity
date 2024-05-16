@@ -1199,7 +1199,7 @@ void CommandLineInterface::assembleYul(yul::YulStack::Language _language, yul::Y
 
 		if (successful && m_options.compiler.outputs.asmJson)
 		{
-			auto const& result = stack.parserResult();
+			std::shared_ptr<yul::Object> result = stack.parserResult();
 			if (result && !result->checkSourceIndices())
 				solThrow(CommandLineExecutionError, "Yul validation error: source indices where incomplete. Please check @use-src attributes.");
 		}
