@@ -59,7 +59,6 @@ Dialect const& languageToDialect(YulStack::Language _language, EVMVersion _versi
 
 }
 
-
 CharStream const& YulStack::charStream(std::string const& _sourceName) const
 {
 	yulAssert(m_charStream, "");

@@ -55,8 +55,7 @@ class AbstractAssembly;
 struct MachineAssemblyObject
 {
 	std::shared_ptr<evmasm::LinkerObject> bytecode;
-	std::string assembly;
-	Json assemblyJson;
+	std::shared_ptr<evmasm::Assembly> assembly;
 	std::unique_ptr<std::string> sourceMappings;
 };
 
@@ -142,7 +141,7 @@ public:
 	/// Return the parsed and analyzed object.
 	std::shared_ptr<Object> parserResult() const;
 
-	void requestAsmJsonOutput(bool _asmJsonOutput);
+	langutil::DebugInfoSelection debugInfoSelction() const { return m_debugInfoSelection; }
 
 private:
 	bool parse(std::string const& _sourceName, std::string const& _source);
@@ -169,8 +168,6 @@ private:
 	langutil::ErrorReporter m_errorReporter;
 
 	std::unique_ptr<std::string> m_sourceMappings;
-
-	bool m_requestAsmJsonOutput = false;
 };
 
 }

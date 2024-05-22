@@ -1246,7 +1246,6 @@ void CommandLineInterface::assembleYul(yul::YulStack::Language _language, yul::Y
 		}
 
 		yul::MachineAssemblyObject object;
-		stack.requestAsmJsonOutput(m_options.compiler.outputs.asmJson);
 		object = stack.assemble(_targetMachine);
 		object.bytecode->link(m_options.linker.libraries);
 
@@ -1267,16 +1266,19 @@ void CommandLineInterface::assembleYul(yul::YulStack::Language _language, yul::Y
 		if (m_options.compiler.outputs.asm_)
 		{
 			sout() << std::endl << "Text representation:" << std::endl;
-			if (!object.assembly.empty())
-				sout() << object.assembly << std::endl;
+			std::string assemblyText{object.assembly->assemblyString(stack.debugInfoSelction())};
+			if (!assemblyText.empty())
+				sout() << assemblyText << std::endl;
 			else
 				report(Error::Severity::Info, "No text representation found.");
 		}
 		if (m_options.compiler.outputs.asmJson)
 		{
 			sout() << std::endl << "EVM assembly:" << std::endl;
+			std::map<std::string, unsigned> sourceIndices;
+			stack.parserResult()->collectSourceIndices(sourceIndices);
 			sout() << util::jsonPrint(
-				object.assemblyJson,
+				object.assembly->assemblyJSON(sourceIndices),
 				m_options.formatting.json
 			) << std::endl;
 		}
