@@ -294,25 +294,26 @@ bool isEvmBytecodeRequested(Json const& _outputSelection)
 	return false;
 }
 
-/// @returns true if any Yul IR was requested. Note that as an exception, '*' does not
-/// yet match "ir", "irAst", "irOptimized" or "irOptimizedAst"
-bool isIRRequested(Json const& _outputSelection)
+/// @returns The requested goal for Yul IR generation inferred from output selection.
+/// Note that as an exception, '*' does not yet match "ir", "irAst", "irOptimized" or "irOptimizedAst".
+CompilerStack::IRGenerationGoal irGenerationGoal(Json const& _outputSelection)
 {
 	if (!_outputSelection.is_object())
-		return false;
+		return CompilerStack::IRGenerationGoal::NoIR;
 
+	CompilerStack::IRGenerationGoal goal = CompilerStack::IRGenerationGoal::NoIR;
 	for (auto const& fileRequests: _outputSelection)
 		for (auto const& requests: fileRequests)
 			for (auto const& request: requests)
-				if (
-					request == "ir" ||
-					request == "irAst" ||
-					request == "irOptimized" ||
-					request == "irOptimizedAst"
-				)
-					return true;
+			{
+				if (request == "irOptimized" || request == "irOptimizedAst")
+					return CompilerStack::IRGenerationGoal::Optimized;
 
-	return false;
+				if (request == "ir" || request == "irAst")
+					goal = CompilerStack::IRGenerationGoal::Unoptimized;
+			}
+
+	return goal;
 }
 
 Json formatLinkReferences(std::map<size_t, std::string> const& linkReferences)
@@ -1319,7 +1320,7 @@ Json StandardCompiler::compileSolidity(StandardCompiler::InputsAndSettings _inpu
 	compilerStack.setModelCheckerSettings(_inputsAndSettings.modelCheckerSettings);
 
 	compilerStack.enableEvmBytecodeGeneration(isEvmBytecodeRequested(_inputsAndSettings.outputSelection));
-	compilerStack.enableIRGeneration(isIRRequested(_inputsAndSettings.outputSelection));
+	compilerStack.enableIRGeneration(irGenerationGoal(_inputsAndSettings.outputSelection));
 
 	Json errors = std::move(_inputsAndSettings.errors);
 

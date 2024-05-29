@@ -313,7 +313,7 @@ void CompilerStack::reset(bool _keepSettings)
 		m_viaIR = false;
 		m_evmVersion = langutil::EVMVersion();
 		m_modelCheckerSettings = ModelCheckerSettings{};
-		m_generateIR = false;
+		m_irGenerationGoal = IRGenerationGoal::NoIR;
 		m_revertStrings = RevertStrings::Default;
 		m_optimiserSettings = OptimiserSettings::minimal();
 		m_metadataLiteralSources = false;
@@ -716,8 +716,8 @@ bool CompilerStack::compile(State _stopAfter)
 				{
 					try
 					{
-						if ((m_generateEvmBytecode && m_viaIR) || m_generateIR)
-							generateIR(*contract);
+						if ((m_generateEvmBytecode && m_viaIR) || m_irGenerationGoal != IRGenerationGoal::NoIR)
+							generateIR(*contract, (m_generateEvmBytecode && m_viaIR) || m_irGenerationGoal == IRGenerationGoal::Optimized);
 						if (m_generateEvmBytecode)
 						{
 							if (m_viaIR)
@@ -1406,7 +1406,7 @@ void CompilerStack::compileContract(
 	assembleYul(_contract, compiler->assemblyPtr(), compiler->runtimeAssemblyPtr());
 }
 
-void CompilerStack::generateIR(ContractDefinition const& _contract)
+void CompilerStack::generateIR(ContractDefinition const& _contract, bool _optimized)
 {
 	solAssert(m_stackState >= AnalysisSuccessful, "");
 
@@ -1424,7 +1424,7 @@ void CompilerStack::generateIR(ContractDefinition const& _contract)
 
 	std::string dependenciesSource;
 	for (auto const& [dependency, referencee]: _contract.annotation().contractDependencies)
-		generateIR(*dependency);
+		generateIR(*dependency, _optimized);
 
 	if (!_contract.canBeDeployed())
 		return;
@@ -1484,9 +1484,12 @@ void CompilerStack::generateIR(ContractDefinition const& _contract)
 	);
 
 	compiledContract.yulIRAst = stack.astJson();
-	stack.optimize();
-	compiledContract.yulIROptimized = stack.print(this);
-	compiledContract.yulIROptimizedAst = stack.astJson();
+	if (_optimized)
+	{
+		stack.optimize();
+		compiledContract.yulIROptimized = stack.print(this);
+		compiledContract.yulIROptimizedAst = stack.astJson();
+	}
 }
 
 void CompilerStack::generateEVMFromIR(ContractDefinition const& _contract)

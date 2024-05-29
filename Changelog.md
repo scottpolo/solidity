@@ -4,9 +4,11 @@ Language Features:
 
 
 Compiler Features:
+ * Command Line Interface: Do not perform IR optimization when only unoptimized IR is requested.
  * EVM: Support for the EVM version "Prague".
  * SMTChecker: Add CHC engine check for underflow and overflow in unary minus operation.
  * SMTChecker: Replace CVC4 as a possible BMC backend with cvc5.
+ * Standard JSON Interface: Do not perform IR optimization when only unoptimized IR is requested.
 
 
 Bugfixes:
