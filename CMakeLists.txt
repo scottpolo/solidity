@@ -20,6 +20,23 @@ include(EthToolchains)
 include(EthPolicy)
 eth_policy()
 
+if(EXISTS "${CMAKE_SOURCE_DIR}/deps/fmt/.git")
+  message(STATUS "git submodules seem to be already initialized: nothing to do.")
+else()
+  message(STATUS "git submodules seem not to be initialized: implicitly executing 'git submodule update --init'.")
+  find_package(Git)
+  if(Git_FOUND)
+    execute_process(
+      COMMAND git submodule update --init
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+      RESULT_VARIABLE result
+    )
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Failed to initialize submodules: 'git submodule update --init' failed.")
+    endif()
+  endif()
+endif()
+
 # project name and version should be set after cmake_policy CMP0048
 set(PROJECT_VERSION "0.8.27")
 # OSX target needed in order to support std::visit
