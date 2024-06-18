@@ -132,6 +132,9 @@ public:
 	/// @returns the errors generated during parsing, analysis (and potentially assembly).
 	langutil::ErrorList const& errors() const { return m_errors; }
 
+	/// @returns true if any errors were generated.
+	bool hasErrors() const { return m_errorReporter.hasErrors(); }
+
 	/// Pretty-print the input after having parsed it.
 	std::string print(
 		langutil::CharStreamProvider const* _soliditySourceProvider = nullptr

@@ -1647,7 +1647,7 @@ Json StandardCompiler::compileYul(InputsAndSettings _inputsAndSettings)
 	std::string const& sourceContents = _inputsAndSettings.sources.begin()->second;
 
 	// Inconsistent state - stop here to receive error reports from users
-	if (!stack.parseAndAnalyze(sourceName, sourceContents) && stack.errors().empty())
+	if (!stack.parseAndAnalyze(sourceName, sourceContents) && !stack.hasErrors())
 	{
 		output["errors"].emplace_back(formatError(
 			Error::Type::InternalCompilerError,
