@@ -52,26 +52,24 @@ SMTLib2Interface::SMTLib2Interface(
 
 void SMTLib2Interface::reset()
 {
-	m_accumulatedOutput.clear();
-	m_accumulatedOutput.emplace_back();
+	m_commands.clear();
 	m_variables.clear();
 	m_userSorts.clear();
 	m_sortNames.clear();
-	write("(set-option :produce-models true)");
+	m_commands.setOption("produce-models", "true");
 	if (m_queryTimeout)
-		write("(set-option :timeout " + std::to_string(*m_queryTimeout) + ")");
-	write("(set-logic ALL)");
+		m_commands.setOption("timeout", std::to_string(*m_queryTimeout));
+	m_commands.setLogic("ALL");
 }
 
 void SMTLib2Interface::push()
 {
-	m_accumulatedOutput.emplace_back();
+	m_commands.push();
 }
 
 void SMTLib2Interface::pop()
 {
-	smtAssert(!m_accumulatedOutput.empty(), "");
-	m_accumulatedOutput.pop_back();
+	m_commands.pop();
 }
 
 void SMTLib2Interface::declareVariable(std::string const& _name, SortPointer const& _sort)
@@ -82,7 +80,7 @@ void SMTLib2Interface::declareVariable(std::string const& _name, SortPointer con
 	else if (!m_variables.count(_name))
 	{
 		m_variables.emplace(_name, _sort);
-		write("(declare-fun |" + _name + "| () " + toSmtLibSort(_sort) + ')');
+		m_commands.declareVariable(_name, toSmtLibSort(_sort));
 	}
 }
 
@@ -94,32 +92,22 @@ void SMTLib2Interface::declareFunction(std::string const& _name, SortPointer con
 	if (!m_variables.count(_name))
 	{
 		auto const& fSort = std::dynamic_pointer_cast<FunctionSort>(_sort);
-		std::string domain = toSmtLibSort(fSort->domain);
+		auto domain = toSmtLibSort(fSort->domain);
 		std::string codomain = toSmtLibSort(fSort->codomain);
 		m_variables.emplace(_name, _sort);
-		write(
-			"(declare-fun |" +
-			_name +
-			"| " +
-			domain +
-			" " +
-			codomain +
-			")"
-		);
+		m_commands.declareFunction(_name, domain, codomain);
 	}
 }
 
 void SMTLib2Interface::addAssertion(Expression const& _expr)
 {
-	write("(assert " + toSExpr(_expr) + ")");
+	m_commands.assertion(toSExpr(_expr));
 }
 
 std::pair<CheckResult, std::vector<std::string>> SMTLib2Interface::check(std::vector<Expression> const& _expressionsToEvaluate)
 {
-	std::string response = querySolver(
-		boost::algorithm::join(m_accumulatedOutput, "\n") +
-		checkSatAndGetValuesCommand(_expressionsToEvaluate)
-	);
+	std::cout << dumpQuery({}) << std::endl;
+	std::string response = querySolver(dumpQuery(_expressionsToEvaluate));
 
 	CheckResult result;
 	// TODO proper parsing
@@ -213,7 +201,7 @@ std::string SMTLib2Interface::toSExpr(Expression const& _expr)
 	return sexpr;
 }
 
-std::string SMTLib2Interface::toSmtLibSort(solidity::smtutil::SortPointer _sort)
+std::string SMTLib2Interface::toSmtLibSort(SortPointer _sort)
 {
 	if (!m_sortNames.count(_sort))
 		m_sortNames[_sort] = toSmtLibSortInternal(_sort);
@@ -239,17 +227,13 @@ std::string SMTLib2Interface::toSmtLibSortInternal(SortPointer _sort)
 	case Kind::Tuple:
 	{
 		auto const& tupleSort = dynamic_cast<TupleSort const&>(*_sort);
-		std::string tupleName = "|" + tupleSort.name + "|";
+		std::string const& tupleName = tupleSort.name;
 		auto isName = [&](auto entry) { return entry.first == tupleName; };
 		if (ranges::find_if(m_userSorts, isName) == m_userSorts.end())
 		{
-			std::string decl("(declare-datatypes ((" + tupleName + " 0)) (((" + tupleName);
-			smtAssert(tupleSort.members.size() == tupleSort.components.size(), "");
-			for (unsigned i = 0; i < tupleSort.members.size(); ++i)
-				decl += " (|" + tupleSort.members.at(i) + "| " + toSmtLibSort(tupleSort.components.at(i)) + ")";
-			decl += "))))";
-			m_userSorts.emplace_back(tupleName, decl);
-			write(decl);
+			smtAssert(tupleSort.members.size() == tupleSort.components.size());
+			auto declaration = m_commands.declareTuple(tupleName, tupleSort.members, toSmtLibSort(tupleSort.components));
+			m_userSorts.emplace_back(tupleName, std::move(declaration));
 		}
 
 		return tupleName;
@@ -259,19 +243,13 @@ std::string SMTLib2Interface::toSmtLibSortInternal(SortPointer _sort)
 	}
 }
 
-std::string SMTLib2Interface::toSmtLibSort(std::vector<SortPointer> const& _sorts)
+std::vector<std::string> SMTLib2Interface::toSmtLibSort(std::vector<SortPointer> const& _sorts)
 {
-	std::string ssort("(");
+	std::vector<std::string> ssorts;
+	ssorts.reserve(_sorts.size());
 	for (auto const& sort: _sorts)
-		ssort += toSmtLibSort(sort) + " ";
-	ssort += ")";
-	return ssort;
-}
-
-void SMTLib2Interface::write(std::string _data)
-{
-	smtAssert(!m_accumulatedOutput.empty(), "");
-	m_accumulatedOutput.back() += std::move(_data) + "\n";
+		ssorts.push_back(toSmtLibSort(sort));
+	return ssorts;
 }
 
 std::string SMTLib2Interface::checkSatAndGetValuesCommand(std::vector<Expression> const& _expressionsToEvaluate)
@@ -333,6 +311,73 @@ std::string SMTLib2Interface::querySolver(std::string const& _input)
 
 std::string SMTLib2Interface::dumpQuery(std::vector<Expression> const& _expressionsToEvaluate)
 {
-	return boost::algorithm::join(m_accumulatedOutput, "\n") +
-		checkSatAndGetValuesCommand(_expressionsToEvaluate);
+	return m_commands.toString() + checkSatAndGetValuesCommand(_expressionsToEvaluate);
+}
+
+
+void SMTLib2Commands::push() {
+	m_frameLimits.push_back(m_commands.size());
+}
+
+void SMTLib2Commands::pop() {
+	smtAssert(!m_commands.empty());
+	auto limit = m_frameLimits.back();
+	m_frameLimits.pop_back();
+	while (m_commands.size() > limit)
+		m_commands.pop_back();
+}
+
+std::string SMTLib2Commands::toString() const {
+	return boost::algorithm::join(m_commands, "\n");
+}
+
+void SMTLib2Commands::clear() {
+	m_commands.clear();
+	m_frameLimits.clear();
+}
+
+void SMTLib2Commands::assertion(std::string _expr) {
+	m_commands.push_back("(assert " + std::move(_expr) + ')');
+}
+
+void SMTLib2Commands::setOption(std::string _name, std::string _value)
+{
+	m_commands.push_back("(set-option :" + std::move(_name) + ' ' + std::move(_value) + ')');
+}
+
+void SMTLib2Commands::setLogic(std::string _logic)
+{
+	m_commands.push_back("(set-logic " + std::move(_logic) + ')');
+}
+
+void SMTLib2Commands::declareVariable(std::string _name, std::string _sort)
+{
+		m_commands.push_back("(declare-fun |" + std::move(_name) + "| () " + std::move(_sort) + ')');
+}
+
+void SMTLib2Commands::declareFunction(std::string const& _name, std::vector<std::string> const& _domain, std::string const& _codomain)
+{
+	std::stringstream ss;
+	ss << "(declare-fun |" << _name << "| " << '(';
+	for (auto && arg : _domain)
+		ss << arg;
+	ss << ')' << ' ' << _codomain << ')';
+	m_commands.push_back(ss.str());
+}
+
+std::string SMTLib2Commands::declareTuple(
+	std::string const& _name,
+	std::vector<std::string> const& _memberNames,
+	std::vector<std::string> const& _memberSorts
+)
+{
+	auto quotedName = '|' + _name + '|';
+	std::stringstream ss;
+	ss << "(declare-datatypes ((" << quotedName << " 0)) (((" << quotedName;
+	for (auto && [memberName, memberSort]: ranges::views::zip(_memberNames, _memberSorts))
+		ss << " (|" << memberName << "| " << memberSort << ")";
+	ss << "))))";
+	auto declaration = ss.str();
+	m_commands.push_back(ss.str());
+	return declaration;
 }

@@ -34,6 +34,36 @@
 namespace solidity::smtutil
 {
 
+class SMTLib2Commands
+{
+public:
+	void push();
+	void pop();
+
+	void clear();
+
+	void assertion(std::string _expr);
+
+	void setOption(std::string _name, std::string _value);
+
+	void setLogic(std::string _logic);
+
+	void declareVariable(std::string _name, std::string _sort);
+	void declareFunction(std::string const& _name, std::vector<std::string> const& _domain, std::string const& _codomain);
+	// TODO: We should not need the declaration back
+	std::string declareTuple(
+		std::string const& _name,
+		std::vector<std::string> const& _memberNames,
+		std::vector<std::string> const& _memberSorts
+	);
+
+	[[nodiscard]] std::string toString() const;
+private:
+	std::vector<std::string> m_commands;
+	std::vector<std::size_t> m_frameLimits;
+
+};
+
 class SMTLib2Interface: public SolverInterface
 {
 public:
@@ -62,7 +92,7 @@ public:
 	// Used by CHCSmtLib2Interface
 	std::string toSExpr(Expression const& _expr);
 	std::string toSmtLibSort(SortPointer _sort);
-	std::string toSmtLibSort(std::vector<SortPointer> const& _sort);
+	std::vector<std::string> toSmtLibSort(std::vector<SortPointer> const& _sort);
 
 	std::map<std::string, SortPointer> variables() { return m_variables; }
 
@@ -76,8 +106,6 @@ protected:
 
 	void declareFunction(std::string const& _name, SortPointer const& _sort);
 
-	void write(std::string _data);
-
 	std::string checkSatAndGetValuesCommand(std::vector<Expression> const& _expressionsToEvaluate);
 	std::vector<std::string> parseValues(std::string::const_iterator _start, std::string::const_iterator _end);
 
@@ -86,7 +114,8 @@ protected:
 
 	std::string toSmtLibSortInternal(SortPointer _sort);
 
-	std::vector<std::string> m_accumulatedOutput;
+	SMTLib2Commands m_commands;
+
 	std::map<std::string, SortPointer> m_variables;
 
 	/// Each pair in this vector represents an SMTChecker created

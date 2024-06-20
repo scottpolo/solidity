@@ -133,7 +133,7 @@ std::string CHCSmtLib2Interface::toSmtLibSort(SortPointer _sort)
 
 std::string CHCSmtLib2Interface::toSmtLibSort(std::vector<SortPointer> const& _sorts)
 {
-	return m_smtlib2->toSmtLibSort(_sorts);
+	return '(' + boost::join(m_smtlib2->toSmtLibSort(_sorts), " ") + ')';
 }
 
 std::string CHCSmtLib2Interface::forall()
