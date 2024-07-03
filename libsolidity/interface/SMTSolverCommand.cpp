@@ -33,6 +33,8 @@
 namespace solidity::frontend
 {
 
+static int const Z3ResourceLimit = 2000000;
+
 void SMTSolverCommand::setEldarica(std::optional<unsigned int> timeoutInMilliseconds, bool computeInvariants)
 {
 	m_arguments.clear();
@@ -61,6 +63,34 @@ void SMTSolverCommand::setCvc5(std::optional<unsigned int> timeoutInMilliseconds
 		m_arguments.push_back("--rlimit");
 		m_arguments.push_back(std::to_string(12000));
 	}
+}
+
+void SMTSolverCommand::setZ3(std::optional<unsigned int> timeoutInMilliseconds, bool _preprocessing)
+{
+	m_arguments.clear();
+	m_solverCmd = "z3";
+	m_arguments.emplace_back("-smt2");
+	if (timeoutInMilliseconds)
+		m_arguments.emplace_back("-t:" + std::to_string(timeoutInMilliseconds.value()));
+	else
+		m_arguments.emplace_back("rlimit=" + std::to_string(Z3ResourceLimit));
+
+	m_arguments.emplace_back("rewriter.pull_cheap_ite=true");
+	// Spacer options.
+	// These are useful for solving problems with arrays and loops.
+	// Use quantified lemma generalizer.
+	m_arguments.emplace_back("fp.spacer.q3.use_qgen=true");
+	m_arguments.emplace_back("fp.spacer.mbqi=false");
+	// Ground pobs by using values from a model.
+	m_arguments.emplace_back("fp.spacer.ground_pobs=false");
+
+	// Spacer optimization should be
+	// - enabled for better solving (default)
+	// - disable for counterexample generation
+	std::string preprocessingArg = _preprocessing ? "true" : "false";
+	m_arguments.emplace_back("fp.xform.slice=" + preprocessingArg);
+	m_arguments.emplace_back("fp.xform.inline_linear=" + preprocessingArg);
+	m_arguments.emplace_back("fp.xform.inline_eager=" + preprocessingArg);
 }
 
 ReadCallback::Result SMTSolverCommand::solve(std::string const& _kind, std::string const& _query) const
