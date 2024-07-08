@@ -2140,12 +2140,21 @@ FunctionType const* ContractType::newExpressionType() const
 	return m_constructorType;
 }
 
-std::vector<std::tuple<VariableDeclaration const*, u256, unsigned>> ContractType::stateVariables() const
+std::vector<std::tuple<VariableDeclaration const*, u256, unsigned>> ContractType::stateVariables(DataLocation _location) const
 {
+	VariableDeclaration::Location location = [&]() {
+		switch (_location)
+		{
+			case DataLocation::Storage: return VariableDeclaration::Location::Unspecified; // By default state variables have unspecified (storage) data location
+			case DataLocation::Transient: return VariableDeclaration::Location::Transient;
+			default: solAssert(false);
+		}
+	}();
+
 	std::vector<VariableDeclaration const*> variables;
 	for (ContractDefinition const* contract: m_contract.annotation().linearizedBaseContracts | ranges::views::reverse)
 		for (VariableDeclaration const* variable: contract->stateVariables())
-			if (!(variable->isConstant() || variable->immutable()))
+			if (!(variable->isConstant() || variable->immutable()) && variable->referenceLocation() == location)
 				variables.push_back(variable);
 	TypePointers types;
 	for (auto variable: variables)

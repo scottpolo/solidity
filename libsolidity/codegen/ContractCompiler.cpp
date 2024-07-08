@@ -570,8 +570,9 @@ void ContractCompiler::appendReturnValuePacker(TypePointers const& _typeParamete
 
 void ContractCompiler::registerStateVariables(ContractDefinition const& _contract)
 {
-	for (auto const& var: ContractType(_contract).stateVariables())
-		m_context.addStateVariable(*std::get<0>(var), std::get<1>(var), std::get<2>(var));
+	for (auto const& location: {DataLocation::Storage, DataLocation::Transient})
+		for (auto const& var: ContractType(_contract).stateVariables(location))
+			m_context.addStateVariable(*std::get<0>(var), std::get<1>(var), std::get<2>(var));
 }
 
 void ContractCompiler::registerImmutableVariables(ContractDefinition const& _contract)

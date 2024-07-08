@@ -1115,8 +1115,9 @@ void IRGenerator::resetContext(ContractDefinition const& _contract, ExecutionCon
 	m_context = std::move(newContext);
 
 	m_context.setMostDerivedContract(_contract);
-	for (auto const& var: ContractType(_contract).stateVariables())
-		m_context.addStateVariable(*std::get<0>(var), std::get<1>(var), std::get<2>(var));
+	for (auto const& location: {DataLocation::Storage, DataLocation::Transient})
+		for (auto const& var: ContractType(_contract).stateVariables(location))
+			m_context.addStateVariable(*std::get<0>(var), std::get<1>(var), std::get<2>(var));
 }
 
 std::string IRGenerator::dispenseLocationComment(ASTNode const& _node)
