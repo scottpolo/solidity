@@ -37,6 +37,10 @@
                     "storage": [],
                     "types": null
                 },
+                "transientStorageLayout": {
+                    "transient-storage": [],
+                    "types": null
+                },
                 "userdoc": {
                     "kind": "user",
                     "methods": {},
