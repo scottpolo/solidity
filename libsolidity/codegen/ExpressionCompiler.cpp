@@ -107,6 +107,8 @@ void ExpressionCompiler::appendStateVariableInitialization(VariableDeclaration c
 	}
 	if (_varDecl.immutable())
 		ImmutableItem(m_context, _varDecl).storeValue(*type, _varDecl.location(), true);
+	else if (_varDecl.referenceLocation() == VariableDeclaration::Location::Transient)
+		TransientStorageItem(m_context, _varDecl).storeValue(*type, _varDecl.location(), true);
 	else
 		StorageItem(m_context, _varDecl).storeValue(*type, _varDecl.location(), true);
 }
@@ -258,6 +260,8 @@ void ExpressionCompiler::appendStateVariableAccessor(VariableDeclaration const& 
 		solAssert(returnTypes.size() == 1, "");
 		if (_varDecl.immutable())
 			ImmutableItem(m_context, _varDecl).retrieveValue(SourceLocation());
+		else if (_varDecl.referenceLocation() == VariableDeclaration::Location::Transient)
+			TransientStorageItem(m_context, *returnType).retrieveValue(SourceLocation(), true);
 		else
 			StorageItem(m_context, *returnType).retrieveValue(SourceLocation(), true);
 		utils().convertType(*returnType, *returnTypes.front());
@@ -2995,7 +2999,12 @@ void ExpressionCompiler::setLValueFromDeclaration(Declaration const& _declaratio
 	if (m_context.isLocalVariable(&_declaration))
 		setLValue<StackVariable>(_expression, dynamic_cast<VariableDeclaration const&>(_declaration));
 	else if (m_context.isStateVariable(&_declaration))
-		setLValue<StorageItem>(_expression, dynamic_cast<VariableDeclaration const&>(_declaration));
+	{
+		if (dynamic_cast<VariableDeclaration const&>(_declaration).referenceLocation() == VariableDeclaration::Location::Transient)
+			setLValue<TransientStorageItem>(_expression, dynamic_cast<VariableDeclaration const&>(_declaration));
+		else
+			setLValue<StorageItem>(_expression, dynamic_cast<VariableDeclaration const&>(_declaration));
+	}
 	else
 		solAssert(false, "Identifier type not supported or identifier not found.");
 }
