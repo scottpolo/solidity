@@ -85,7 +85,6 @@ public:
 			vertices[verticesIdMap[from]].successors.emplace_back(&vertices[verticesIdMap[to]]);
 
 		entry = &vertices[0];
-		numVertices = _vertices.size();
 		expectedIdom = labelMapToIdMap(_expectedIdom);
 		expectedDFSIndices = toVertexMapById(_expectedDFSIndices);
 		expectedDominatorTree = vertexMapToVertexId(_expectedDominatorTree);
@@ -129,7 +128,6 @@ public:
 		}) | ranges::to<std::map<TestVertexLabel, std::vector<TestVertexId>>>);
 	}
 
-	size_t numVertices = 0;
 	TestVertex const* entry = nullptr;
 	std::vector<TestVertex> vertices;
 	// Reverse map from vertices labels to ids
@@ -200,7 +198,7 @@ BOOST_AUTO_TEST_CASE(immediate_dominator_1)
 		}
 	);
 
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 	BOOST_TEST(dominatorFinder.idom() == test.expectedIdom);
 	BOOST_TEST(dominatorFinder.dfsIndexById() == test.expectedDFSIndices);
 	BOOST_TEST(dominatorFinder.dominatorTree() == test.expectedDominatorTree);
@@ -253,7 +251,7 @@ BOOST_AUTO_TEST_CASE(immediate_dominator_2)
 			{"D", {"E", "F"}}
 		}
 	);
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 	BOOST_TEST(dominatorFinder.idom() == test.expectedIdom);
 	BOOST_TEST(dominatorFinder.dfsIndexById() == test.expectedDFSIndices);
 	BOOST_TEST(dominatorFinder.dominatorTree() == test.expectedDominatorTree);
@@ -331,7 +329,7 @@ BOOST_AUTO_TEST_CASE(immediate_dominator_3)
 			{"E", {"F"}}
 		}
 	);
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 	BOOST_TEST(dominatorFinder.idom() == test.expectedIdom);
 	BOOST_TEST(dominatorFinder.dfsIndexById() == test.expectedDFSIndices);
 	BOOST_TEST(dominatorFinder.dominatorTree() == test.expectedDominatorTree);
@@ -403,7 +401,7 @@ BOOST_AUTO_TEST_CASE(langauer_tarjan_p122_fig1)
 			{"G", {"J"}}
 		}
 	);
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 	BOOST_TEST(dominatorFinder.idom() == test.expectedIdom);
 	BOOST_TEST(dominatorFinder.dfsIndexById() == test.expectedDFSIndices);
 	BOOST_TEST(dominatorFinder.dominatorTree() == test.expectedDominatorTree);
@@ -462,7 +460,7 @@ BOOST_AUTO_TEST_CASE(loukas_georgiadis)
 			{"R", {"W", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "Y"}},
 		}
 	);
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 	BOOST_TEST(dominatorFinder.idom() == test.expectedIdom);
 	BOOST_TEST(dominatorFinder.dfsIndexById() == test.expectedDFSIndices);
 	BOOST_TEST(dominatorFinder.dominatorTree() == test.expectedDominatorTree);
@@ -540,7 +538,7 @@ BOOST_AUTO_TEST_CASE(itworst)
 			{"Y2", {"Y3"}}
 		}
 	);
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 	BOOST_TEST(dominatorFinder.idom() == test.expectedIdom);
 	BOOST_TEST(dominatorFinder.dfsIndexById() == test.expectedDFSIndices);
 	BOOST_TEST(dominatorFinder.dominatorTree() == test.expectedDominatorTree);
@@ -600,7 +598,7 @@ BOOST_AUTO_TEST_CASE(idfsquad)
 			{"X2", {"X3"}}
 		}
 	);
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 	BOOST_TEST(dominatorFinder.idom() == test.expectedIdom);
 	BOOST_TEST(dominatorFinder.dfsIndexById() == test.expectedDFSIndices);
 	BOOST_TEST(dominatorFinder.dominatorTree() == test.expectedDominatorTree);
@@ -647,7 +645,7 @@ BOOST_AUTO_TEST_CASE(ibsfquad)
 			{"Y", {"Z"}}
 		}
 	);
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 	BOOST_TEST(dominatorFinder.idom() == test.expectedIdom);
 	BOOST_TEST(dominatorFinder.dfsIndexById() == test.expectedDFSIndices);
 	BOOST_TEST(dominatorFinder.dominatorTree() == test.expectedDominatorTree);
@@ -695,7 +693,7 @@ BOOST_AUTO_TEST_CASE(sncaworst)
 			{"X2", {"X3"}}
 		}
 	);
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 	BOOST_TEST(dominatorFinder.idom() == test.expectedIdom);
 	BOOST_TEST(dominatorFinder.dfsIndexById() == test.expectedDFSIndices);
 	BOOST_TEST(dominatorFinder.dominatorTree() == test.expectedDominatorTree);
@@ -745,7 +743,7 @@ BOOST_AUTO_TEST_CASE(collect_all_dominators_of_a_vertex)
 	};
 
 
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 	BOOST_TEST(toVertexLabel(dominatorFinder.dominatorsOf(test.verticesIdMap["A"])) == std::vector<TestVertexLabel>());
 	BOOST_TEST(toVertexLabel(dominatorFinder.dominatorsOf(test.verticesIdMap["B"])) == std::vector<TestVertexLabel>({"A"}));
 	BOOST_TEST(toVertexLabel(dominatorFinder.dominatorsOf(test.verticesIdMap["C"])) == std::vector<TestVertexLabel>({"B", "A"}));
@@ -806,10 +804,10 @@ BOOST_AUTO_TEST_CASE(check_dominance)
 	// @return: A vector of booleans where the index represents the vertex and the value
 	// represents if the vertex dominates the other vertex at that index.
 	auto makeDominanceVertexRelation = [&](std::vector<size_t> const& _indices = {}){
-		std::vector<bool> dominance(test.numVertices, false);
+		std::vector<bool> dominance(test.vertices.size(), false);
 		for (size_t i: _indices)
 		{
-			soltestAssert(i < test.numVertices);
+			soltestAssert(i < test.vertices.size());
 			dominance[i] = true;
 		}
 		return dominance;
@@ -818,7 +816,7 @@ BOOST_AUTO_TEST_CASE(check_dominance)
 	// Dominance truth table for all vertices.
 	// Note that it includes self-dominance relation.
 	std::vector<std::vector<bool>> expectedDominanceTable = {
-		std::vector<bool>(test.numVertices, true),    // A dominates all vertices, including itself
+		std::vector<bool>(test.vertices.size(), true),    // A dominates all vertices, including itself
 		makeDominanceVertexRelation({1,2,3,4,5,6,7}), // B, C, D, E, F, G, H
 		makeDominanceVertexRelation({2, 6, 7}), // C, G, H
 		makeDominanceVertexRelation({3, 4}),    // D, E
@@ -827,15 +825,15 @@ BOOST_AUTO_TEST_CASE(check_dominance)
 		makeDominanceVertexRelation({6, 7}),    // G, H
 		makeDominanceVertexRelation({7})        // H
 	};
-	soltestAssert(expectedDominanceTable.size() == test.numVertices);
+	soltestAssert(expectedDominanceTable.size() == test.vertices.size());
 
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 
 	BOOST_TEST(dominatorFinder.dfsIndexById() == test.expectedDFSIndices);
 	// Check if the dominance table is as expected.
 	for (size_t i = 0; i < expectedDominanceTable.size(); ++i)
 	{
-		soltestAssert(expectedDominanceTable[i].size() == test.numVertices);
+		soltestAssert(expectedDominanceTable[i].size() == test.vertices.size());
 		for (size_t j = 0; j < expectedDominanceTable[i].size(); ++j)
 		{
 			bool iDominatesJ = dominatorFinder.dominates(i, j);
@@ -867,7 +865,7 @@ BOOST_AUTO_TEST_CASE(no_edges)
 		{}
 	);
 
-	TestDominatorFinder dominatorFinder(*test.entry, test.numVertices);
+	TestDominatorFinder dominatorFinder(*test.entry);
 	BOOST_TEST(dominatorFinder.idom() == test.expectedIdom);
 	BOOST_TEST(dominatorFinder.dfsIndexById() == test.expectedDFSIndices);
 	BOOST_TEST(dominatorFinder.dominatorTree() == test.expectedDominatorTree);
