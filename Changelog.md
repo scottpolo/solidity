@@ -7,7 +7,7 @@ Language Features:
 
 
 Compiler Features:
- * Commandline Interface: Output transient storage layout with option `--transient-storage-layout`.
+ * Commandline Interface: Output transient storage layout with option ``--transient-storage-layout``.
  * Error Reporting: Unimplemented features are now properly reported as errors instead of being handled as if they were bugs.
  * EVM: Support for the EVM version "Prague".
  * SMTChecker: Add CHC engine check for underflow and overflow in unary minus operation.
