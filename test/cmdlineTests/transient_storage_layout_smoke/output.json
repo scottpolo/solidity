@@ -1,0 +1,17 @@
+{
+    "contracts": {
+        "fileA": {
+            "A": {
+                "transientStorageLayout": {
+                    "transient-storage": [],
+                    "types": null
+                }
+            }
+        }
+    },
+    "sources": {
+        "fileA": {
+            "id": 0
+        }
+    }
+}
