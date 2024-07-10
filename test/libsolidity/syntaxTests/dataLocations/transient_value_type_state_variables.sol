@@ -8,4 +8,3 @@ contract C {
 	bytes32 transient y;
 }
 // ----
-// UnimplementedFeatureError 1834: Transient storage variables are not supported.

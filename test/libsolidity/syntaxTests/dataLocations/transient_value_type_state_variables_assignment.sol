@@ -6,4 +6,3 @@ contract C {
 	bool transient b = x > 0 ? false : true;
 }
 // ----
-// UnimplementedFeatureError 1834: Transient storage variables are not supported.

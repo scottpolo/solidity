@@ -8,4 +8,3 @@ contract C {
     uint transient private tprv;
 }
 // ----
-// UnimplementedFeatureError 1834: Transient storage variables are not supported.

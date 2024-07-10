@@ -7,4 +7,3 @@ contract C {
     function () internal internal transient fiit;
 }
 // ----
-// UnimplementedFeatureError 1834: Transient storage variables are not supported.
