@@ -30,8 +30,7 @@ contract C
 // SMTEngine: all
 // SMTIgnoreCex: yes
 // ----
-// Warning 6368: (340-355): CHC: Out of bounds access might happen here.
 // Warning 6368: (612-627): CHC: Out of bounds access might happen here.
-// Warning 6328: (860-880): CHC: Assertion violation happens here.
+// Warning 6328: (860-880): CHC: Assertion violation happens here.\nCounterexample:\n\nx = 0\n\nTransaction trace:\nC.constructor()\nC.g(0)\n    C.f(map) -- counterexample incomplete; parameter name used instead of value -- internal call
 // Warning 6368: (936-952): CHC: Out of bounds access might happen here.
-// Info 1391: CHC: 7 verification condition(s) proved safe! Enable the model checker option "show proved safe" to see all of them.
+// Info 1391: CHC: 8 verification condition(s) proved safe! Enable the model checker option "show proved safe" to see all of them.
