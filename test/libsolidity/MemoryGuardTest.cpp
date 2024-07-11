@@ -26,6 +26,7 @@
 #include <libyul/Object.h>
 #include <libyul/backends/evm/EVMDialect.h>
 #include <libyul/optimiser/FunctionCallFinder.h>
+#include <libyul/AST.h>
 #include <fstream>
 #include <memory>
 #include <stdexcept>
@@ -74,7 +75,7 @@ TestCase::TestResult MemoryGuardTest::run(std::ostream& _stream, std::string con
 
 		auto handleObject = [&](std::string const& _kind, Object const& _object) {
 			m_obtainedResult += contractName + "(" + _kind + ") " + (FunctionCallFinder::run(
-				*_object.code,
+				const_cast<yul::Block&>(_object.code->block()), // todo remove const cast once const function call finder pr is merged
 				"memoryguard"_yulstring
 			).empty() ? "false" : "true") + "\n";
 		};
